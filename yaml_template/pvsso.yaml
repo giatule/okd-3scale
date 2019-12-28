@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: aws-efs-sso
+  labels:
+     pv: nfs-pv02
+spec:
+  capacity:
+    storage: 10Gi 
+  accessModes:
+  - ReadWriteMany 
+  nfs: 
+    path: /cluster/sso
+    server: fs-0a8ada2b.efs.ap-northeast-1.amazonaws.com
+  persistentVolumeReclaimPolicy: Recycle

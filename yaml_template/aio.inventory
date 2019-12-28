@@ -1,0 +1,36 @@
+# Create an OSEv3 group that contains the master, nodes, etcd, and lb groups.
+# The lb group lets Ansible configure HAProxy as the load balancing solution.
+# Comment lb out if your load balancer is pre-configured.
+[OSEv3:children]
+masters
+nodes
+etcd
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=ec2-user
+ansible_become=yes
+openshift_deployment_type=origin
+openshift_docker_insecure_registries=172.30.0.0/16
+openshift_no_proxy='.amp.com,localhost,127.0.0.1,172.30.1.1'
+openshift_master_cluster_hostname=aio.amp.com
+openshift_public_hostname=aio.amp.com
+openshift_master_default_subdomain=aio.amp.com
+
+# uncomment the following to enable htpasswd authentication; defaults to AllowAllPasswordIdentityProvider
+#openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_users={'admin': '$apr1$qUzPB4aO$cx1r7GRVICRdeDKXjMQkD1'}
+
+# host group for masters
+[masters]
+aio.amp.com openshift_public_hostname=aio.amp.com
+
+# host group for etc
+[etcd]
+aio.amp.com openshift_public_hostname=aio.amp.com
+
+# Specify load balancer host
+# host group for nodes, includes region info
+[nodes]
+aio.amp.com openshift_node_group_name='node-config-all-in-one'
